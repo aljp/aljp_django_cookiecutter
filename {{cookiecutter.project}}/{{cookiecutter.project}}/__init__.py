@@ -1,0 +1,1 @@
+{% if "y" in cookiecutter.celery %}from .celery import app as celery_app{% endif %}

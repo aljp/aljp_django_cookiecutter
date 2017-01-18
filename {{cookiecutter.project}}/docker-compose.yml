@@ -1,0 +1,100 @@
+version: '2'
+services:
+  postgres:
+    image: postgres:9.5
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB={{cookiecutter.project}}
+      - POSTGRES_PASSWORD=guest
+      - POSTGRES_USER=guest
+    volumes:
+      - /var/lib/postgresql/data:/var/lib/postgresql/data
+  web:
+    build:
+      context: .
+      dockerfile: docker/django/Dockerfile
+    command: bash -c "sleep 3 && python manage.py runserver 0.0.0.0:80"
+    volumes:
+      - .:/code
+    ports:
+      - "80:80"
+      - "12546:12546"
+    depends_on:
+      - postgres
+{% if "y" in cookiecutter.celery or "y" in cookiecutter.cache %}
+      - redis
+{% endif %}
+{% if "y" in cookiecutter.celery %}
+      - amqp
+{% endif %}
+      - mailcatcher
+    links:
+      - postgres:postgres
+{% if "y" in cookiecutter.celery or "y" in cookiecutter.cache %}
+      - redis:redis
+{% endif %}
+{% if "y" in cookiecutter.celery %}
+      - amqp:amqp
+{% endif %}
+      - mailcatcher:mailcatcher
+    env_file: .env
+  mailcatcher:
+    image: schickling/mailcatcher
+    ports:
+      - "1025:1025"
+      - "1080:1080"
+
+{% if "y" in cookiecutter.celery or "y" in cookiecutter.cache %}
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+{% endif %}
+{% if "y" in cookiecutter.celery %}
+  amqp:
+    image: rabbitmq:3.6.1
+    ports:
+      - "5671:5671"
+      - "5672:5672"
+      - "4369:4369"
+      - "25672:25672"
+  celery:
+    build:
+      context: .
+      dockerfile: docker/django/Dockerfile
+    command: bash -c "sleep 3 && celery -A {{cookiecutter.project}}.celery worker -E -l info --concurrency=2"
+    volumes:
+      - .:/code
+    depends_on:
+      - postgres
+      - redis
+      - amqp
+      - mailcatcher
+    links:
+      - postgres:postgres
+      - redis:redis
+      - amqp:amqp
+      - mailcatcher:mailcatcher
+    env_file: .env
+    restart: always
+  beat:
+    build:
+      context: .
+      dockerfile: docker/django/Dockerfile
+    command: bash -c "sleep 3 && celery -A {{cookiecutter.project}}.settings.celery beat"
+    volumes:
+      - .:/code
+    depends_on:
+      - postgres
+      - redis
+      - amqp
+      - mailcatcher
+    links:
+      - postgres:postgres
+      - redis:redis
+      - amqp:amqp
+      - mailcatcher:mailcatcher
+    env_file: .env
+    restart: always
+{% endif %}

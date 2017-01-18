@@ -1,0 +1,7 @@
+./{{cookiecutter.project}}/{{cookiecutter.project}}/__pycache__/__init__.cpython-35.pyc
+./{{cookiecutter.project}}/{{cookiecutter.project}}/__pycache__/celery.cpython-35.pyc
+./{{cookiecutter.project}}/{{cookiecutter.project}}/__pycache__/urls.cpython-35.pyc
+./{{cookiecutter.project}}/{{cookiecutter.project}}/__pycache__/wsgi.cpython-35.pyc
+./{{cookiecutter.project}}/{{cookiecutter.project}}/settings/__pycache__/__init__.cpython-35.pyc
+./{{cookiecutter.project}}/{{cookiecutter.project}}/settings/__pycache__/local.cpython-35.pyc
+./{{cookiecutter.project}}/{{cookiecutter.project}}/settings/__pycache__/settings.cpython-35.pyc

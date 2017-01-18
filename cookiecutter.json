@@ -1,0 +1,8 @@
+{
+  "project": "my_django_project",
+  "secret_key": "",
+  "vagrant_ip": "192.168.56.101",
+  "dev_domain": "192.168.56.101",
+  "cache": "n",
+  "celery": "n"
+}
